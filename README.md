@@ -26,7 +26,7 @@ main.ipynb does not include the complete theoretical cell-wise details of the me
 In order to converge towards appreciable classification results for the given dataset, a total of fiveapproaches were attempted, with only two being fully implemented in this work.  These fully implemented approaches are as follows:<br><br>
 •<b>Support Vector Machines (SVM) based approach</b>: It uses the SVC class of the SVM supervisedlearning method in order to classify test set records.<br>
 •<b>Bag of Words (BOW) approach</b>:  It is based on the notion of creating a set of words for eachpossible category and then predicting labels using the description word count in each of thesebag of words.<br>
-<img src='images/FEATURE SELECTION.png'><br><br>
+
 The  flow  diagram  above  briefs  the  implementation  pipeline  for  the  undertaken  sets of approaches.  As can be observed, the initial stages are shared by both the approaches.  They diverge when each model splits the dataset into training and testing subsets.
 
 ## 1.2 RELEVANT QUESTIONS
@@ -39,7 +39,7 @@ The  flow  diagram  above  briefs  the  implementation  pipeline  for  the  unde
 •Not  every  label  present  in  the  test  set  was  present  in  the  set  of  predicted  labels.   This  is probably  due  to  inclusion  of  all  the  least  frequently  occurring  labels  in  the  test  set,  thus rendering the model incapable of predicting them<br><br>
 •Due to presence of some labels having very few records in the entire dataset, the model wasnot able to learn appropriately about such records,  and thus misclassifying them.<br><br>
 Thus, a more robust heuristic can be deployed in order to avoid the above stated problems. Strengthening  the  accuracies  of  the  dominant  labels  strongly favors the overall model performance as these labels are reflective of the entire dataset.
-<img src='images/bar.png'><br><br>
+
 
 # CHAPTER-2 DATA CLEANING AND PROCESSING
 
@@ -49,28 +49,28 @@ Thus, a more robust heuristic can be deployed in order to avoid the above stated
 By splitting the category tree string on′ >> ′returned the hierarchy of categories each record is enlisted into.  The first entry in this list refers to the primary category for that particular item. Thus, only these values were retained for future use, dropping the rest of the category tree from further consideration.  Highest count for any category is of ’clothing’ with more than 6000 records.On the other hand, there existed highly specific categories with only single records in the entiredataset (eg. libas printed womens anarkali kurta) . Such records had a single level product categorytree and thus were immediately discarded from further consideration.  Some categories with morethan a single level of categorization and with only a handful of records ( eg.  ebooks ) have stillbeen considered for subsequent steps.<br><br>
 ## 2.3 PREPROCESSING
 <br>The overall task of preprocessing primarily involves the product description.  For each record in theupdated dataset instance (obtained after feature selection and updating the category attribute),the description text goes through a series of standard NLP preprocessing modules, followed by acustom word set removal module.<br><br>
-<img src='images/text_preprocess.png'><br><br>
+
 Though the product description goes through an extensive sequence of preprocessing steps,  the product brand, on the contrary, is simply converted to lowercase. The brand name then contributes towards the creation of the set of custom words, i.e.  a set of words which though occur in the description, and surpass the entire preprocessing timeline, but still do not contribute towards the task of classifying the product.  Examples of such words include ’sale’, ’delivery’,’guarantee’,’warranty’etc.   Similarily,  having  a  brand  name  in  the  product  description,  in  no  way,  aids  in  identifying its  category.   Though  there  might  be  certain  brands  in  the  given  dataset  that  are  limited  to  asubset of categories only, it cannot be implied that such brands would not be adding products intoother categories in the future.  One of the ways to improve the current preprocessing pipeline is to curate an extensive list of such custom words.  Since the current implementation consists of words identified through manual inspection, designing such a set primarily for this purpose can furtherhelp to filter out unnecessary words from the description.<br><br>
 
 # CHAPTER-3 SVM MODEL
 <br>The Support Vector Machines (SVM) model defined for classifying products incorporates the useof pre-trained vectors in order to define the attributes for each record in the dataset.  These pre-trained vectors are the embeddings for the record descriptions and their dimension denotes thenumber of attributes of each record.  These values are then passed onto the SVC class of SVMsupervised learning method to perform multi-class classification.<br><br>
-<img src='images/svm.png'><br><br>
+
 
 ## 3.1 HOW ARE INPUT ATTRIBUTES PREPARED?
 <br> he  input  to  SVM  is  prepared  using  only  the  product  descriptions.   In  order  to  prepare  this input, a pre-trained vectors file ’glove.6B.50d.txt’ was used to obatin the feature representations.  ’glove.6B.50d.txt’, as the name implies, is a file with 50-dimensional word embeddings for 6B tokens obtained using GLoVe unsupervised learningalgorithm. Since  each  product  description  comprises  of  at  least  2  words  almost  all  the  time,  the  approach chosen to obtain a single 50-dimesnional feature representation for the entire phrase was to compute average of the embeddings over all the words in the descripton.The approach taken in such scenarioshas been defined in Algorithm 1.The reason for choosing SVM for this task was its efficiency in high-dimensional spaces and their capability to support both dense and sparse vectors as input.  Higher dimensionality embeddings can be utilized in such scenarios using pre-trained language models such as BERT.<br><br>
-<img src='images/glove.png'><br><br>
+
 
 # CHAPTER-4 BAG-OF-WORDS (BOW) MODEL
 <br>The BOW model, as the name suggests, involves making discrete sets of words from a portion ofthe given dataset record descriptions and use these sets to predict the categories for the recorddescriptions  of  the  remainder  of  the  dataset.   The  approach  though  involves  no  secret  sauce  ofstate-of-the-art machine learning methods, yet holds the potential to perform multi-label classi-fication given the circumstances of good amount of data.<br><br>
-<img src='images/bow.png'><br><br>
+
 This model performs well for categories with a appreciable number of records.  The less frequently occurring records, on the other hand, face problems in classification due to lack of size of their corresponding bag of words. One of the better circumstances to use such a model is when there is an even distribution of labels among the records giving each bag-of-word an approximately fair share of words for prediction.<br><br>
 
 # CHAPTER-5 VISUALIZING THE RESULTS
-<br><br><img src='images/visualize.png'><br><br>
+
 The Level-1 visualization briefs the superficial results without any information of label-wise classification results. The results at this level include the accuracy scores ( (no. of correctly predicted) / ( total test set records) and precision and recall) along with a simple pie chart visualization of these prediction counts.<br>
-<br><img src='images/level1.png'>
+
 <br><br>In order to gain insights relevant to label-wise prediction counts and performance, the Level-2 visualization represents the results using a grouped bar graph with the number of correctly predicted labels and misclassified labels for each possible label value. Though the visualization of this level is bit non-uniform due the uneven distribution of records, it at the least provides a notion of the distribution of records into the possible label values.<br><br>
-<img src='images/bargraph.png'>
+
 <br><br>A comprehensive analysis of the classifications can be obtained at this level using the heatmap visualization of the results. Such a representation offers the capability to compare the prediction results between any possible combination of label pairs. The heatmap results have been displayed in percentage format to reduce the high variance in classification values.<br><br>
 <img src='images/heatmap.png'><br><br>
 In order to observe the trends in SVM and BOW model performances,  their respective accuracies,precision and recall were recorded over multiple train-test split sizes.  The results for precisionand recall were not recorded as stated in section 1.2.  As can be observed from the results in the table below, the accuracy scores do not exhibit a monotonous increase or decrease in values, instead,for training set of 90 percent, both the models experience a reduction in their test set accuracies.The potential reason for the bag of words to not perform well with increase in train set size is dueto addition of new records majorly from the dominant label (i.e.  clothing),  thus increasing thesize of that bag of words and reducing the probability of classifying other labels correctly.  Over-all, the SVM model performs far better than BOW model across all the train-test size splits.  The BOW model can potentially perform better in a dataset with a more evenly distributed set of labels.<br><br>
